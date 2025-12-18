@@ -1,6 +1,22 @@
 import React from "react";
+import './ActivityCard.css';
 
-export default function ActivityCard({ activity }) {
+function ActivityCard({ activity }) {
+  // Handler to unregister a participant
+  const handleDelete = async (name) => {
+    try {
+      await fetch(`/activities/${encodeURIComponent(activity.title)}/unregister`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: name })
+      });
+      // Optionally, trigger a refresh or callback here
+      window.location.reload();
+    } catch (err) {
+      alert('Failed to unregister participant.');
+    }
+  };
+
   return (
     <div className="activity-card">
       <h4>{activity.title}</h4>
@@ -8,9 +24,19 @@ export default function ActivityCard({ activity }) {
       <div className="activity-card-participants">
         <h5>Participants</h5>
         {activity.participants && activity.participants.length > 0 ? (
-          <ul>
+          <ul className="participants-list">
             {activity.participants.map((name, idx) => (
-              <li key={idx}>{name}</li>
+              <li key={idx} className="participant-item">
+                {name}
+                <span
+                  className="delete-icon"
+                  title="Remove participant"
+                  onClick={() => handleDelete(name)}
+                  style={{ cursor: 'pointer', marginLeft: 8 }}
+                >
+                  ❌
+                </span>
+              </li>
             ))}
           </ul>
         ) : (
@@ -20,3 +46,5 @@ export default function ActivityCard({ activity }) {
     </div>
   );
 }
+
+export default ActivityCard;
